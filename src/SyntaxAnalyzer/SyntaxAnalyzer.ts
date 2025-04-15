@@ -2,6 +2,7 @@ import { Multiplication } from './Tree/Multiplication';
 import { Division } from './Tree/Division';
 import { Addition } from './Tree/Addition';
 import { Subtraction } from './Tree/Subtraction';
+import { MinusOperation } from './Tree/MinusOperation';
 import { NumberConstant } from './Tree/NumberConstant';
 import { SymbolsCodes } from '../LexicalAnalyzer/SymbolsCodes';
 import { LexicalAnalyzer } from '../LexicalAnalyzer/LexicalAnalyzer';
@@ -99,7 +100,14 @@ export class SyntaxAnalyzer {
      * Разбор "слагаемого"
      */
     scanTerm(): TreeNodeBase {
-        let multiplier: TreeNodeBase = this.scanMultiplier();
+        let multiplier: TreeNodeBase;
+
+        if (this.symbol.symbolCode === SymbolsCodes.minus) {
+          let minus= true;  
+          multiplier = this.scanUnminus(minus);  
+        } else {
+          multiplier = this.scanMultiplier();
+        }
         let operationSymbol: SymbolBase | null = null;
 
         while (this.symbol !== null && (
@@ -121,18 +129,38 @@ export class SyntaxAnalyzer {
                     break;
             }
         }
-
         return multiplier;
     }
+/** */
+    scanUnminus(minus): MinusOperation {   
+        let UnMinusValue: SymbolBase | null;
+        let result;
+        this.nextSym();
+        
+        if (this.symbol.symbolCode === SymbolsCodes.minus) {  
+            (minus== true) ? (minus= false): (minus= true); 
+            result=this.scanUnminus(minus);
+        } else {
+            UnMinusValue = this.symbol;
+            this.accept(SymbolsCodes.integerConst); 
+        }
+
+        if (minus==true) {
+          result = new MinusOperation(UnMinusValue); 
+        } else {
+          result= new NumberConstant(UnMinusValue); 
+        }                
+        return result;
+      }
 
     /**
      *  Разбор "множителя"
      */
     scanMultiplier(): NumberConstant {
-        let integerConstant: SymbolBase | null = this.symbol;
-
-        this.accept(SymbolsCodes.integerConst); // проверим, что текущий символ это именно константа, а не что-то еще
-
-        return new NumberConstant(integerConstant);
+        
+            let integerConstant: SymbolBase | null = this.symbol;
+            this.accept(SymbolsCodes.integerConst); // проверим, что текущий символ это именно константа, а не что-то еще
+    
+            return new NumberConstant(integerConstant);    
+        }  
     }
-};

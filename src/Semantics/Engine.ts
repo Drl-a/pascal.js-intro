@@ -1,6 +1,7 @@
 import { Addition } from '../SyntaxAnalyzer/Tree/Addition';
 import { Multiplication } from '../SyntaxAnalyzer/Tree/Multiplication';
 import { Subtraction } from '../SyntaxAnalyzer/Tree/Subtraction';
+import { MinusOperation } from '../SyntaxAnalyzer/Tree/MinusOperation';
 import { Division } from '../SyntaxAnalyzer/Tree/Division';
 import { NumberConstant } from '../SyntaxAnalyzer/Tree/NumberConstant';
 import { NumberVariable } from './Variables/NumberVariable';
@@ -79,10 +80,14 @@ export class Engine {
         }
     }
 
+
+
     evaluateMultiplier(expression: TreeNodeBase) {
         if (expression instanceof NumberConstant) {
             return new NumberVariable(expression.symbol.value);
-        } else {
+        } else if (expression instanceof MinusOperation) {
+            return new NumberVariable (-expression.symbol.value);
+        }else{         
             throw 'Number Constant expected.';
         }
     }

@@ -80,7 +80,7 @@ export class LexicalAnalyzer {
                 case '-':
                     this.char = this.fileIO.nextCh();
                     return this.getSymbol(SymbolsCodes.minus);
-
+                    
                 case '+':
                     this.char = this.fileIO.nextCh();
                     return this.getSymbol(SymbolsCodes.plus);
