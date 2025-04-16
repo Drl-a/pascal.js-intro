@@ -101,13 +101,8 @@ export class SyntaxAnalyzer {
      */
     scanTerm(): TreeNodeBase {
         let multiplier: TreeNodeBase;
-
-        if (this.symbol.symbolCode === SymbolsCodes.minus) {
-          let minus= true;  
-          multiplier = this.scanUnminus(minus);  
-        } else {
           multiplier = this.scanMultiplier();
-        }
+        
         let operationSymbol: SymbolBase | null = null;
 
         while (this.symbol !== null && (
@@ -157,10 +152,14 @@ export class SyntaxAnalyzer {
      *  Разбор "множителя"
      */
     scanMultiplier(): NumberConstant {
-        
+        if (this.symbol.symbolCode === SymbolsCodes.minus) {
+            
+            return this.scanUnminus(true);  
+        } else {
             let integerConstant: SymbolBase | null = this.symbol;
             this.accept(SymbolsCodes.integerConst); // проверим, что текущий символ это именно константа, а не что-то еще
     
             return new NumberConstant(integerConstant);    
-        }  
+        }
     }
+}

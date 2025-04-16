@@ -15,17 +15,25 @@ test('result = -4', () => {
 });
 
 test('result = -2', () => {
-  expect(pjs.engine.results[0]).toBe(-2);
+  expect(pjs.engine.results[1]).toBe(-2);
 });
 
 test('result = -2', () => {
-  expect(pjs.engine.results[0]).toBe(-2);
+  expect(pjs.engine.results[2]).toBe(-2);
 });
 
 test('result = -3', () => {
-  expect(pjs.engine.results[0]).toBe(-3);
+  expect(pjs.engine.results[3]).toBe(-3);
 });
 
 test('result = 20', () => {
-  expect(pjs.engine.results[0]).toBe(20);
+  expect(pjs.engine.results[4]).toBe(20);
+});
+
+test('result = 20', () => {
+  expect(pjs.engine.results[5]).toBe(20);
+});
+
+test('result = -5', () => {
+  expect(pjs.engine.results[6]).toBe(-5);
 });
