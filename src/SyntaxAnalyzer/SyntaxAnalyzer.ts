@@ -101,6 +101,8 @@ export class SyntaxAnalyzer {
      */
     scanTerm(): TreeNodeBase {
         let multiplier: TreeNodeBase;
+
+       
           multiplier = this.scanMultiplier();
         
         let operationSymbol: SymbolBase | null = null;
@@ -126,7 +128,7 @@ export class SyntaxAnalyzer {
         }
         return multiplier;
     }
-/** */
+
     scanUnminus(minus): MinusOperation {   
         let UnMinusValue: SymbolBase | null;
         let result;
@@ -138,13 +140,14 @@ export class SyntaxAnalyzer {
         } else {
             UnMinusValue = this.symbol;
             this.accept(SymbolsCodes.integerConst); 
-        }
+        
 
-        if (minus==true) {
-          result = new MinusOperation(UnMinusValue); 
-        } else {
-          result= new NumberConstant(UnMinusValue); 
-        }                
+            if (minus==true) {
+            result = new MinusOperation(UnMinusValue); 
+            } else {
+            result= new NumberConstant(UnMinusValue); 
+            }          
+        }          
         return result;
       }
 
