@@ -155,7 +155,10 @@ export class SyntaxAnalyzer {
      *  Разбор "множителя"
      */
     scanMultiplier(): NumberConstant {
-        if (this.symbol.symbolCode === SymbolsCodes.minus) {
+        if (this.symbol === null) {
+            throw `Number expected but END OF FILE found!`;
+
+        }else if (this.symbol.symbolCode === SymbolsCodes.minus) {
             
             return this.scanUnminus(true);  
         } else {
