@@ -129,40 +129,26 @@ export class SyntaxAnalyzer {
         return multiplier;
     }
 
-    scanUnminus(minus): MinusOperation {   
-        let UnMinusValue: SymbolBase | null;
-        let result;
-        this.nextSym();
-        
-        if (this.symbol.symbolCode === SymbolsCodes.minus) {  
-            (minus== true) ? (minus= false): (minus= true); 
-            result=this.scanUnminus(minus);
-        } else {
-            UnMinusValue = this.symbol;
-            this.accept(SymbolsCodes.integerConst); 
-        
-
-            if (minus==true) {
-            result = new MinusOperation(UnMinusValue); 
-            } else {
-            result= new NumberConstant(UnMinusValue); 
-            }          
-        }          
-        return result;
-      }
-
     /**
      *  Разбор "множителя"
      */
     scanMultiplier(): NumberConstant {
-        if (this.symbol.symbolCode === SymbolsCodes.minus) {
-            
-            return this.scanUnminus(true);  
-        } else {
-            let integerConstant: SymbolBase | null = this.symbol;
-            this.accept(SymbolsCodes.integerConst); // проверим, что текущий символ это именно константа, а не что-то еще
-    
-            return new NumberConstant(integerConstant);    
+        if (this.symbol === null) {
+            throw `Number expected but END OF FILE found!`;
+        }    
+        let minus;
+        while (this.symbol.symbolCode === SymbolsCodes.minus) {
+            (minus!==true)? (minus=true): (minus=false);
+            this.nextSym();
         }
+        
+        let integerConstant: SymbolBase | null = this.symbol;
+        this.accept(SymbolsCodes.integerConst); // проверим, что текущий символ это именно константа, а не что-то еще
+        if (minus==true) {
+            return new MinusOperation(integerConstant); 
+        } else {
+            return new NumberConstant(integerConstant); 
+        }     
+        
     }
 }
