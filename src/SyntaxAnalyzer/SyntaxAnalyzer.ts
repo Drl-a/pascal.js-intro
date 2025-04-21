@@ -73,6 +73,10 @@ export class SyntaxAnalyzer {
         let term: TreeNodeBase = this.scanTerm();
         let operationSymbol: SymbolBase | null = null;
 
+        if (this.symbol.symbolCode === SymbolsCodes.bracketclose) {
+            this.scanBrackets();
+        }
+
         while (this.symbol !== null && (
             this.symbol.symbolCode === SymbolsCodes.plus ||
             this.symbol.symbolCode === SymbolsCodes.minus
@@ -100,11 +104,8 @@ export class SyntaxAnalyzer {
      * Разбор "слагаемого"
      */
     scanTerm(): TreeNodeBase {
-        let multiplier: TreeNodeBase;
-
-       
-          multiplier = this.scanMultiplier();
-        
+      
+        let multiplier: TreeNodeBase = this.scanMultiplier();       
         let operationSymbol: SymbolBase | null = null;
 
         while (this.symbol !== null && (
@@ -129,18 +130,39 @@ export class SyntaxAnalyzer {
         return multiplier;
     }
 
+    scanBrackets(): TreeNodeBase {
+        let open =1;
+         /**let close =0;*/
+        let result; 
+        while (open>0) {
+            this.nextSym(); 
+            result= this.scanExpression();
+            if (this.symbol.symbolCode === SymbolsCodes.bracketopen) {
+                open+=1;
+            } else if (this.symbol.symbolCode === SymbolsCodes.bracketclose) {
+                open-=1;
+            }
+            this.nextSym();
+        } 
+        return result;
+    }
     /**
      *  Разбор "множителя"
      */
-    scanMultiplier(): NumberConstant {
+    scanMultiplier(minus:boolean=false): NumberConstant {
         if (this.symbol === null) {
             throw `Number expected but END OF FILE found!`;
-        }    
-        let minus;
-        while (this.symbol.symbolCode === SymbolsCodes.minus) {
+        } 
+        
+        if (this.symbol.symbolCode === SymbolsCodes.bracketopen){
+            return this.scanBrackets(); 
+        }
+        
+        if (this.symbol.symbolCode === SymbolsCodes.minus) {
             (minus!==true)? (minus=true): (minus=false);
             this.nextSym();
-        }
+            return this.scanMultiplier(minus);
+        }    
         
         let integerConstant: SymbolBase | null = this.symbol;
         this.accept(SymbolsCodes.integerConst); // проверим, что текущий символ это именно константа, а не что-то еще
@@ -148,7 +170,6 @@ export class SyntaxAnalyzer {
             return new MinusOperation(integerConstant); 
         } else {
             return new NumberConstant(integerConstant); 
-        }     
-        
+        }            
     }
 }

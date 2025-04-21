@@ -3,6 +3,8 @@ export enum SymbolsCodes {
     minus = '-',
     star = '*',
     slash = '/',
+    bracketopen = '(',
+    bracketclose = ')',
     identifier = 'ident',
     integerConst = 'int',
     endOfLine = 'eol',

@@ -92,6 +92,14 @@ export class LexicalAnalyzer {
                 case '/':
                     this.char = this.fileIO.nextCh();
                     return this.getSymbol(SymbolsCodes.slash);
+                    
+                case '(':
+                    this.char = this.fileIO.nextCh();
+                    return this.getSymbol(SymbolsCodes.bracketopen);
+                    
+                case ')':
+                    this.char = this.fileIO.nextCh();
+                    return this.getSymbol(SymbolsCodes.bracketclose);            
             }
         }
         throw `Inadmissible symbol:${this.char}.`;
