@@ -73,10 +73,6 @@ export class SyntaxAnalyzer {
         let term: TreeNodeBase = this.scanTerm();
         let operationSymbol: SymbolBase | null = null;
 
-        if (this.symbol.symbolCode === SymbolsCodes.bracketclose) {
-            this.scanBrackets();
-        }
-
         while (this.symbol !== null && (
             this.symbol.symbolCode === SymbolsCodes.plus ||
             this.symbol.symbolCode === SymbolsCodes.minus
@@ -110,16 +106,20 @@ export class SyntaxAnalyzer {
 
         while (this.symbol !== null && (
             this.symbol.symbolCode === SymbolsCodes.star ||
-            this.symbol.symbolCode === SymbolsCodes.slash
+            this.symbol.symbolCode === SymbolsCodes.slash ||
+            this.symbol.symbolCode === SymbolsCodes.bracketopen
         )) {
 
             operationSymbol = this.symbol;
-            this.nextSym();
+            
+            if (this.symbol.symbolCode !== SymbolsCodes.bracketopen) {               
+                this.nextSym();                          
+            }
 
             let secondTerm: TreeNodeBase = this.scanMultiplier();
-
             switch (operationSymbol.symbolCode) {
-                case SymbolsCodes.star:
+                case SymbolsCodes.star: 
+                case SymbolsCodes.bracketopen:   
                     multiplier = new Multiplication(operationSymbol, multiplier, secondTerm);
                     break;
                 case SymbolsCodes.slash:
@@ -131,19 +131,17 @@ export class SyntaxAnalyzer {
     }
 
     scanBrackets(): TreeNodeBase {
-        let open =1;
-         /**let close =0;*/
-        let result; 
-        while (open>0) {
-            this.nextSym(); 
-            result= this.scanExpression();
-            if (this.symbol.symbolCode === SymbolsCodes.bracketopen) {
-                open+=1;
-            } else if (this.symbol.symbolCode === SymbolsCodes.bracketclose) {
-                open-=1;
-            }
-            this.nextSym();
-        } 
+        let open =1;       
+        this.nextSym(); 
+        let result= this.scanExpression();
+        if (this.symbol.symbolCode === SymbolsCodes.bracketclose) {
+            open-=1;
+        }
+        this.nextSym();
+        if (this.symbol === null && open>0){
+            throw ') expected but END OF FILE found!';  
+        }           
+         
         return result;
     }
     /**

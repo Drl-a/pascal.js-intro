@@ -75,6 +75,8 @@ export class Engine {
             let result = leftOperand.value / rightOperand.value;
 
             return new NumberVariable(result);
+        } else if (expression instanceof Addition || expression instanceof Subtraction) {
+            return this.evaluateSimpleExpression(expression);
         } else {
             return this.evaluateMultiplier(expression);
         }
