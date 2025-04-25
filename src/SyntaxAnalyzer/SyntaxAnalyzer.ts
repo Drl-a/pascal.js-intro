@@ -138,6 +138,9 @@ export class SyntaxAnalyzer {
             open-=1;
         }
         this.nextSym();
+        if (this.symbol !== null && this.symbol.symbolCode === SymbolsCodes.integerConst) {
+            throw 'operator expected but operand found'
+        }            
         if (this.symbol === null && open>0){
             throw ') expected but END OF FILE found!';  
         }           
@@ -148,19 +151,20 @@ export class SyntaxAnalyzer {
      *  Разбор "множителя"
      */
     scanMultiplier(minus:boolean=false): NumberConstant {
-        if (this.symbol === null) {
+        if (this.symbol === null) { 
             throw `Number expected but END OF FILE found!`;
-        } 
+        }    
         
-        if (this.symbol.symbolCode === SymbolsCodes.bracketopen){
+        switch (this.symbol.symbolCode) {
+        case  SymbolsCodes.bracketopen:
             return this.scanBrackets(); 
-        }
         
-        if (this.symbol.symbolCode === SymbolsCodes.minus) {
+        case SymbolsCodes.minus: {
             (minus!==true)? (minus=true): (minus=false);
             this.nextSym();
             return this.scanMultiplier(minus);
-        }    
+            }   
+        }     
         
         let integerConstant: SymbolBase | null = this.symbol;
         this.accept(SymbolsCodes.integerConst); // проверим, что текущий символ это именно константа, а не что-то еще
