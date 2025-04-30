@@ -77,12 +77,10 @@ export class Engine {
             let result = leftOperand.value / rightOperand.value;
 
             return new NumberVariable(result);
-        } else if (expression instanceof Addition || expression instanceof Subtraction) {
-            return this.evaluateSimpleExpression(expression);
         } else {
             return this.evaluateMultiplier(expression);
         }
-    }
+    }   
 
 
 
@@ -90,13 +88,16 @@ export class Engine {
         if (expression instanceof NumberConstant) {
             return new NumberVariable(expression.symbol.value);
         } else if (expression instanceof MinusOperation) {
-            if (expression.smth instanceof NumberConstant) {
-                return new NumberVariable (-expression.smth.symbol.value);
+            if (expression.minusvalue instanceof NumberConstant) {
+                return new NumberVariable (-expression.minusvalue.symbol.value);
             } else {
-                let result= this.evaluateSimpleExpression(expression.smth)
+                let result= this.evaluateSimpleExpression(expression.minusvalue)
                 return new NumberVariable(-result.value);
             }
-           
+        } else if (expression instanceof Addition || expression instanceof Subtraction){
+            return this.evaluateSimpleExpression(expression);
+        } else if (expression instanceof Multiplication || expression instanceof Division){
+            return this.evaluateTerm(expression);   
         }else{         
             throw 'Number Constant expected.';
         }

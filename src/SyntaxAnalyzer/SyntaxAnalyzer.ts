@@ -139,22 +139,25 @@ export class SyntaxAnalyzer {
         }    
         
         switch (this.symbol.symbolCode) {
-        case  SymbolsCodes.bracketopen:
-            this.nextSym(); 
-            let brackets:TreeNodeBase= this.scanExpression(); 
-            this.accept(SymbolsCodes.bracketclose);
-            if (minus==true) {
-                return new MinusOperation(negative, brackets);
-            }
+            case  SymbolsCodes.bracketopen:
+                this.nextSym(); 
+                let brackets:TreeNodeBase= this.scanExpression(); 
+                this.accept(SymbolsCodes.bracketclose);
+                if (Number.isFinite(this.symbol)){
+                     brackets=new Multiplication(this.symbol,this.scanMultiplier(),brackets)
+                }
+                if (minus==true) {
+                    return new MinusOperation(negative, brackets);
+                }
+                
+                return brackets;
             
-            return brackets;
-        
-        case SymbolsCodes.minus: {
-            negative= this.symbol;
-            (minus!==true)? (minus=true): (minus=false);
-            this.nextSym();
-            return this.scanMultiplier(minus,negative);
-            }   
+            case SymbolsCodes.minus: {
+                negative= this.symbol;
+                (minus!==true)? (minus=true): (minus=false);
+                this.nextSym();
+                return this.scanMultiplier(minus,negative);
+                }   
         }     
         
         let integerConstant: SymbolBase | null = this.symbol;
