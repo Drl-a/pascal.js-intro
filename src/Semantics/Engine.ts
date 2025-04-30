@@ -6,6 +6,7 @@ import { Division } from '../SyntaxAnalyzer/Tree/Division';
 import { NumberConstant } from '../SyntaxAnalyzer/Tree/NumberConstant';
 import { NumberVariable } from './Variables/NumberVariable';
 import { TreeNodeBase } from '../SyntaxAnalyzer/Tree/TreeNodeBase';
+import { BinaryOperation } from 'src/SyntaxAnalyzer/Tree/BinaryOperation';
 
 export class Engine {
     /**
@@ -56,6 +57,7 @@ export class Engine {
 
             return new NumberVariable(result as number);
 
+        
         } else {
             return this.evaluateTerm(expression);
         }
@@ -88,7 +90,13 @@ export class Engine {
         if (expression instanceof NumberConstant) {
             return new NumberVariable(expression.symbol.value);
         } else if (expression instanceof MinusOperation) {
-            return new NumberVariable (-expression.symbol.value);
+            if (expression.smth instanceof NumberConstant) {
+                return new NumberVariable (-expression.smth.symbol.value);
+            } else {
+                let result= this.evaluateSimpleExpression(expression.smth)
+                return new NumberVariable(-result.value);
+            }
+           
         }else{         
             throw 'Number Constant expected.';
         }

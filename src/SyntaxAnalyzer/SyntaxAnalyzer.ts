@@ -130,46 +130,38 @@ export class SyntaxAnalyzer {
         return multiplier;
     }
 
-    scanBrackets(): TreeNodeBase {
-        let open =1;       
-        this.nextSym(); 
-        let result= this.scanExpression();
-        if (this.symbol.symbolCode === SymbolsCodes.bracketclose) {
-            open-=1;
-        }
-        this.nextSym();
-        if (this.symbol !== null && this.symbol.symbolCode === SymbolsCodes.integerConst) {
-            throw 'operator expected but operand found'
-        }            
-        if (this.symbol === null && open>0){
-            throw ') expected but END OF FILE found!';  
-        }           
-         
-        return result;
-    }
     /**
      *  Разбор "множителя"
      */
-    scanMultiplier(minus:boolean=false): NumberConstant {
+    scanMultiplier(minus:boolean=false, negative:SymbolBase=null): NumberConstant {
         if (this.symbol === null) { 
             throw `Number expected but END OF FILE found!`;
         }    
         
         switch (this.symbol.symbolCode) {
         case  SymbolsCodes.bracketopen:
-            return this.scanBrackets(); 
+            this.nextSym(); 
+            let brackets:TreeNodeBase= this.scanExpression(); 
+            this.accept(SymbolsCodes.bracketclose);
+            if (minus==true) {
+                return new MinusOperation(negative, brackets);
+            }
+            
+            return brackets;
         
         case SymbolsCodes.minus: {
+            negative= this.symbol;
             (minus!==true)? (minus=true): (minus=false);
             this.nextSym();
-            return this.scanMultiplier(minus);
+            return this.scanMultiplier(minus,negative);
             }   
         }     
         
         let integerConstant: SymbolBase | null = this.symbol;
         this.accept(SymbolsCodes.integerConst); // проверим, что текущий символ это именно константа, а не что-то еще
+            let result= new NumberConstant(integerConstant); 
         if (minus==true) {
-            return new MinusOperation(integerConstant); 
+            return new MinusOperation(negative, result); 
         } else {
             return new NumberConstant(integerConstant); 
         }            

@@ -2,11 +2,11 @@ import { runFile, insp } from '../../helpers/testsHelper';
 
 let pjs = runFile(import.meta.url, 'skobki.code');
 
-
-test('result = 6', () => {
-  expect(pjs.engine.results[0]).toBe(6);
-});
  
+test('result = -4', () => {
+  expect(pjs.engine.results[0]).toBe(-4);
+});
+
 test('result = 12', () => {
   expect(pjs.engine.results[1]).toBe(12);
 });
@@ -18,7 +18,7 @@ test('result = 8', () => {
 test('result = 5', () => {
   expect(pjs.engine.results[3]).toBe(5);
 });
-
+ 
 test('result = 1', () => {
   expect(pjs.engine.results[4]).toBe(1);
 });
