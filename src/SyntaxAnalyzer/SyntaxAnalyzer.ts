@@ -143,7 +143,7 @@ export class SyntaxAnalyzer {
                 this.nextSym(); 
                 let brackets:TreeNodeBase= this.scanExpression(); 
                 this.accept(SymbolsCodes.bracketclose);
-                if (Number.isFinite(this.symbol)){
+                if (this.symbol !== null && Number.isInteger(this.symbol.value)){
                      brackets=new Multiplication(this.symbol,this.scanMultiplier(),brackets)
                 }
                 if (minus==true) {
