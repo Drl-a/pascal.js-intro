@@ -100,26 +100,32 @@ export class SyntaxAnalyzer {
      * Разбор "слагаемого"
      */
     scanTerm(): TreeNodeBase {
-      
-        let multiplier: TreeNodeBase = this.scanMultiplier();       
+        let brackets:boolean=false;
+        if (this.symbol.symbolCode !== SymbolsCodes.bracketopen) {
+            brackets=true;
+        }
+        let multiplier:TreeNodeBase = this.scanMultiplier();       
         let operationSymbol: SymbolBase | null = null;
 
         while (this.symbol !== null && (
             this.symbol.symbolCode === SymbolsCodes.star ||
             this.symbol.symbolCode === SymbolsCodes.slash ||
-            this.symbol.symbolCode === SymbolsCodes.bracketopen
+            this.symbol.symbolCode === SymbolsCodes.bracketopen||
+            (this.symbol.symbolCode === SymbolsCodes.integerConst && brackets===true) 
         )) {
 
             operationSymbol = this.symbol;
             
-            if (this.symbol.symbolCode !== SymbolsCodes.bracketopen) {               
+            if (this.symbol.symbolCode !== SymbolsCodes.bracketopen && 
+                this.symbol.symbolCode!==SymbolsCodes.integerConst) {               
                 this.nextSym();                          
             }
 
             let secondTerm: TreeNodeBase = this.scanMultiplier();
             switch (operationSymbol.symbolCode) {
                 case SymbolsCodes.star: 
-                case SymbolsCodes.bracketopen:   
+                case SymbolsCodes.bracketopen: 
+                case SymbolsCodes.integerConst:  
                     multiplier = new Multiplication(operationSymbol, multiplier, secondTerm);
                     break;
                 case SymbolsCodes.slash:
@@ -143,9 +149,9 @@ export class SyntaxAnalyzer {
                 this.nextSym(); 
                 let brackets:TreeNodeBase= this.scanExpression(); 
                 this.accept(SymbolsCodes.bracketclose);
-                if (this.symbol !== null && Number.isInteger(this.symbol.value)){
+            /**    if (this.symbol !== null && Number.isInteger(this.symbol.value)){
                      brackets=new Multiplication(this.symbol,this.scanMultiplier(),brackets)
-                }
+                } */
                 if (minus==true) {
                     return new MinusOperation(negative, brackets);
                 }

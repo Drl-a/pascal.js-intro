@@ -21,3 +21,11 @@ test('result = 5', () => {
 test('result = 1', () => {
   expect(pjs.engine.results[4]).toBe(1);
 });
+
+test('result = 12', () => {
+  expect(pjs.engine.results[5]).toBe(12);
+});
+
+test('result = -20', () => {
+  expect(pjs.engine.results[6]).toBe(-20);
+});
