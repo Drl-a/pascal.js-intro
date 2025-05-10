@@ -101,10 +101,11 @@ export class SyntaxAnalyzer {
      */
     scanTerm(): TreeNodeBase {
         let brackets:boolean=false;
-        if (this.symbol.symbolCode !== SymbolsCodes.bracketopen) {
+        
+        let multiplier:TreeNodeBase = this.scanMultiplier();
+        if (multiplier instanceof MinusOperation && multiplier.minusvalue instanceof BinaryOperation){
             brackets=true;
-        }
-        let multiplier:TreeNodeBase = this.scanMultiplier();       
+        }       
         let operationSymbol: SymbolBase | null = null;
 
         while (this.symbol !== null && (
@@ -121,7 +122,13 @@ export class SyntaxAnalyzer {
                 this.nextSym();                          
             }
 
+            if (this.symbol.symbolCode === SymbolsCodes.bracketopen) {
+                brackets=true;
+            }
             let secondTerm: TreeNodeBase = this.scanMultiplier();
+            if (secondTerm instanceof MinusOperation && secondTerm.minusvalue instanceof BinaryOperation){
+                brackets=true;
+            }
             switch (operationSymbol.symbolCode) {
                 case SymbolsCodes.star: 
                 case SymbolsCodes.bracketopen: 
@@ -130,12 +137,21 @@ export class SyntaxAnalyzer {
                     break;
                 case SymbolsCodes.slash:
                     multiplier = new Division(operationSymbol, multiplier, secondTerm);
-                    break;
+                    if (this.symbol.symbolCode !== SymbolsCodes.integerConst){
+                        break;
+                    }
             }
         }
         return multiplier;
     }
-
+/** 
+    scanBrackets(): TreeNodeBase{
+        this.nextSym(); 
+        let brackets:TreeNodeBase= this.scanExpression(); 
+        this.accept(SymbolsCodes.bracketclose);
+        return brackets;
+    }
+*/
     /**
      *  Разбор "множителя"
      */
@@ -143,9 +159,10 @@ export class SyntaxAnalyzer {
         if (this.symbol === null) { 
             throw `Number expected but END OF FILE found!`;
         }    
-        
+         
         switch (this.symbol.symbolCode) {
             case  SymbolsCodes.bracketopen:
+               
                 this.nextSym(); 
                 let brackets:TreeNodeBase= this.scanExpression(); 
                 this.accept(SymbolsCodes.bracketclose);
