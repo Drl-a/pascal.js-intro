@@ -103,7 +103,8 @@ export class SyntaxAnalyzer {
         let brackets:boolean=false;
         
         let multiplier:TreeNodeBase = this.scanMultiplier();
-        if (multiplier instanceof MinusOperation && multiplier.minusvalue instanceof BinaryOperation){
+        if (multiplier instanceof BinaryOperation ||
+            (multiplier instanceof MinusOperation && multiplier.minusvalue instanceof BinaryOperation)){
             brackets=true;
         }       
         let operationSymbol: SymbolBase | null = null;
@@ -126,7 +127,8 @@ export class SyntaxAnalyzer {
                 brackets=true;
             }
             let secondTerm: TreeNodeBase = this.scanMultiplier();
-            if (secondTerm instanceof MinusOperation && secondTerm.minusvalue instanceof BinaryOperation){
+            if (multiplier instanceof BinaryOperation ||
+                (multiplier instanceof MinusOperation && multiplier.minusvalue instanceof BinaryOperation)){
                 brackets=true;
             }
             switch (operationSymbol.symbolCode) {
@@ -137,9 +139,7 @@ export class SyntaxAnalyzer {
                     break;
                 case SymbolsCodes.slash:
                     multiplier = new Division(operationSymbol, multiplier, secondTerm);
-                    if (this.symbol.symbolCode !== SymbolsCodes.integerConst){
-                        break;
-                    }
+                    break;                    
             }
         }
         return multiplier;
