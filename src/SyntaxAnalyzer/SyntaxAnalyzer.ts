@@ -122,13 +122,10 @@ export class SyntaxAnalyzer {
                 this.symbol.symbolCode!==SymbolsCodes.integerConst) {               
                 this.nextSym();                          
             }
-
-            if (this.symbol.symbolCode === SymbolsCodes.bracketopen) {
-                brackets=true;
-            }
+         
             let secondTerm: TreeNodeBase = this.scanMultiplier();
-            if (multiplier instanceof BinaryOperation ||
-                (multiplier instanceof MinusOperation && multiplier.minusvalue instanceof BinaryOperation)){
+            if (secondTerm instanceof BinaryOperation ||
+                (secondTerm instanceof MinusOperation && secondTerm.minusvalue instanceof BinaryOperation)){
                 brackets=true;
             }
             switch (operationSymbol.symbolCode) {
@@ -144,14 +141,7 @@ export class SyntaxAnalyzer {
         }
         return multiplier;
     }
-/** 
-    scanBrackets(): TreeNodeBase{
-        this.nextSym(); 
-        let brackets:TreeNodeBase= this.scanExpression(); 
-        this.accept(SymbolsCodes.bracketclose);
-        return brackets;
-    }
-*/
+
     /**
      *  Разбор "множителя"
      */
@@ -161,8 +151,7 @@ export class SyntaxAnalyzer {
         }    
          
         switch (this.symbol.symbolCode) {
-            case  SymbolsCodes.bracketopen:
-               
+            case  SymbolsCodes.bracketopen:              
                 this.nextSym(); 
                 let brackets:TreeNodeBase= this.scanExpression(); 
                 this.accept(SymbolsCodes.bracketclose);
