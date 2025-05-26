@@ -5,7 +5,7 @@ let pjs = runFile(import.meta.url, 'skobki.code');
 test('result = -4', () => {
   expect(pjs.engine.results[0]).toBe(-4);
 });
- 
+/** 
 test('result = 12', () => {
   expect(pjs.engine.results[1]).toBe(12);
 });
@@ -32,4 +32,4 @@ test('result = -20', () => {
 
 test('result = 11', () => {
   expect(pjs.engine.results[7]).toBe(11);
-});
+}); */

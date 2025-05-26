@@ -108,4 +108,23 @@ export class LexicalAnalyzer {
     getSymbol(symbolCode) {
         return new Symbol(symbolCode, this.currentWord);
     }
+
+    prevSym(){
+        this.skipCharback();
+
+        let result= this.scanSymbol();    
+        return result;
+    }
+
+    skipCharback(){
+        let ws = /[ \t]/;
+
+        while ((this.char !== null)
+            && ws.exec(this.char) !== null) {
+            this.char = this.fileIO.prevCh();
+        }
+        while (ws.exec(this.char) == null) {
+            this.char = this.fileIO.prevCh();
+        }
+    }
 }

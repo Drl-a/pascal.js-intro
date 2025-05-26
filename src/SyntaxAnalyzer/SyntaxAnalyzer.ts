@@ -37,6 +37,10 @@ export class SyntaxAnalyzer {
         this.symbol = this.lexicalAnalyzer.nextSym();
     }
 
+    prevSym(): void {
+        this.symbol = this.lexicalAnalyzer.prevSym();
+    }
+
     accept(expectedSymbolCode: string): void {
         if (this.symbol === null) {
             throw `${expectedSymbolCode} expected but END OF FILE found!`;
@@ -103,10 +107,12 @@ export class SyntaxAnalyzer {
         let brackets:boolean=false;
         
         let multiplier:TreeNodeBase = this.scanMultiplier();
-        if (multiplier instanceof BinaryOperation ||
-            (multiplier instanceof MinusOperation && multiplier.minusvalue instanceof BinaryOperation)){
-            brackets=true;
-        }       
+        
+        this.prevSym();
+        brackets= this.symbol!==null && 
+            this.symbol.symbolCode===SymbolsCodes.bracketclose; 
+        this.nextSym();
+
         let operationSymbol: SymbolBase | null = null;
 
         while (this.symbol !== null && (
@@ -124,10 +130,7 @@ export class SyntaxAnalyzer {
             }
          
             let secondTerm: TreeNodeBase = this.scanMultiplier();
-            if (secondTerm instanceof BinaryOperation ||
-                (secondTerm instanceof MinusOperation && secondTerm.minusvalue instanceof BinaryOperation)){
-                brackets=true;
-            }
+
             switch (operationSymbol.symbolCode) {
                 case SymbolsCodes.star: 
                 case SymbolsCodes.bracketopen: 
