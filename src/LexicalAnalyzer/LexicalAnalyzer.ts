@@ -8,6 +8,7 @@ export class LexicalAnalyzer {
     currentWord: string;
     fileIO: FileIO;
     char: string | null;
+    
 
     constructor(fileIO) {
         this.fileIO = fileIO;
@@ -109,22 +110,19 @@ export class LexicalAnalyzer {
         return new Symbol(symbolCode, this.currentWord);
     }
 
-    prevSym(){
-        this.skipCharback();
-
-        let result= this.scanSymbol();    
-        return result;
-    }
-
     skipCharback(){
         let ws = /[ \t]/;
+        let digit= /\d/;
 
+        while ((this.char !== null)
+            && digit.exec(this.char) !== null) {
+            this.char = this.fileIO.prevCh();
+        }
+        
         while ((this.char !== null)
             && ws.exec(this.char) !== null) {
             this.char = this.fileIO.prevCh();
         }
-        while (ws.exec(this.char) == null) {
-            this.char = this.fileIO.prevCh();
-        }
+        return this.char;
     }
 }

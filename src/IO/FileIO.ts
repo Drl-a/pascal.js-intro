@@ -4,7 +4,7 @@ import fs from 'fs';
 export class FileIO {
     charPointer: number;
     text: string;
-    backCharPointer: number;
+    backCharPointer: number=0;
 
     constructor(fileName) {
         this.charPointer = 0;
@@ -18,11 +18,11 @@ export class FileIO {
     }
 
     prevCh() {  
-        if (this.backCharPointer= 0) {
+       /* if (this.backCharPointer=== 0) {
             this.backCharPointer= this.charPointer;
-        }       
-        return this.backCharPointer > 0?
-            this.text[this.backCharPointer--]:
+        }       */
+        return this.charPointer > 0?
+            this.text[this.charPointer+2]:
             null;
     }
 }

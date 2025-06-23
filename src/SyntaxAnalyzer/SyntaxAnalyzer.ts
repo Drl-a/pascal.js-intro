@@ -17,6 +17,7 @@ export class SyntaxAnalyzer {
 
     lexicalAnalyzer: LexicalAnalyzer;
     symbol: SymbolBase | null;
+    prevSymbol: SymbolBase | null;
 
     /**
      * Деревья, которые будут построены (например, для каждой строки исходного кода)
@@ -27,18 +28,17 @@ export class SyntaxAnalyzer {
         this.lexicalAnalyzer = lexicalAnalyzer;
         this.symbol = null;
         this.trees = [];
+        this.prevSymbol= null;
     }
 
     /**
      * Перемещаемся по последовательности "символов" лексического анализатора,
      * получая очередной "символ" ("слово")
      */
-    nextSym(): void {
-        this.symbol = this.lexicalAnalyzer.nextSym();
-    }
 
-    prevSym(): void {
-        this.symbol = this.lexicalAnalyzer.prevSym();
+    nextSym(): void {
+        this.prevSymbol=this.symbol
+        this.symbol = this.lexicalAnalyzer.nextSym();
     }
 
     accept(expectedSymbolCode: string): void {
@@ -107,22 +107,28 @@ export class SyntaxAnalyzer {
         let brackets:boolean=false;
         
         let multiplier:TreeNodeBase = this.scanMultiplier();
-        
-        this.prevSym();
-        brackets= this.symbol!==null && 
-            this.symbol.symbolCode===SymbolsCodes.bracketclose; 
-        this.nextSym();
+    
 
         let operationSymbol: SymbolBase | null = null;
-
+        
         while (this.symbol !== null && (
             this.symbol.symbolCode === SymbolsCodes.star ||
             this.symbol.symbolCode === SymbolsCodes.slash ||
             this.symbol.symbolCode === SymbolsCodes.bracketopen||
-            (this.symbol.symbolCode === SymbolsCodes.integerConst && brackets===true) 
+            (this.symbol.symbolCode === SymbolsCodes.integerConst) 
         )) {
 
             operationSymbol = this.symbol;
+            if (this.symbol.symbolCode=== SymbolsCodes.integerConst){
+                let currentSym:SymbolBase | null = this.symbol;
+                this.symbol= this.prevSymbol;
+                brackets= this.symbol!==null && 
+                    this.symbol.symbolCode===SymbolsCodes.bracketclose; 
+                if (brackets===false){
+                    throw "Operation symbol expected but int found"
+                }
+                this.symbol= currentSym;
+            }
             
             if (this.symbol.symbolCode !== SymbolsCodes.bracketopen && 
                 this.symbol.symbolCode!==SymbolsCodes.integerConst) {               
