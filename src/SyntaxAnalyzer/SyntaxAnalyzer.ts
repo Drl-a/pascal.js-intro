@@ -119,15 +119,8 @@ export class SyntaxAnalyzer {
         )) {
 
             operationSymbol = this.symbol;
-            if (this.symbol.symbolCode=== SymbolsCodes.integerConst){
-                let currentSym:SymbolBase | null = this.symbol;
-                this.symbol= this.prevSymbol;
-                brackets= this.symbol!==null && 
-                    this.symbol.symbolCode===SymbolsCodes.bracketclose; 
-                if (brackets===false){
+            if (this.symbol.symbolCode=== SymbolsCodes.integerConst && (this.prevSymbol===null || this.prevSymbol.symbolCode!== SymbolsCodes.bracketclose)){
                     throw "Operation symbol expected but int found"
-                }
-                this.symbol= currentSym;
             }
             
             if (this.symbol.symbolCode !== SymbolsCodes.bracketopen && 
