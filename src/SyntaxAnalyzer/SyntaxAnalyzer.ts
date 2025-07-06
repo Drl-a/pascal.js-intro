@@ -18,6 +18,7 @@ export class SyntaxAnalyzer {
     lexicalAnalyzer: LexicalAnalyzer;
     symbol: SymbolBase | null;
     prevSymbol: SymbolBase | null;
+    variables={};
 
     /**
      * Деревья, которые будут построены (например, для каждой строки исходного кода)
@@ -29,6 +30,7 @@ export class SyntaxAnalyzer {
         this.symbol = null;
         this.trees = [];
         this.prevSymbol= null;
+        this.variables;
     }
 
     /**
@@ -115,12 +117,17 @@ export class SyntaxAnalyzer {
             this.symbol.symbolCode === SymbolsCodes.star ||
             this.symbol.symbolCode === SymbolsCodes.slash ||
             this.symbol.symbolCode === SymbolsCodes.bracketopen||
-            (this.symbol.symbolCode === SymbolsCodes.integerConst) 
+            this.symbol.symbolCode === SymbolsCodes.integerConst ||
+            this.symbol.symbolCode === SymbolsCodes.equality 
         )) {
 
             operationSymbol = this.symbol;
             if (this.symbol.symbolCode=== SymbolsCodes.integerConst && (this.prevSymbol===null || this.prevSymbol.symbolCode!== SymbolsCodes.bracketclose)){
                     throw "Operation symbol expected but int found"
+            }
+
+            if (this.symbol.symbolCode === SymbolsCodes.equality && this.prevSymbol.symbolCode===SymbolsCodes.identifier){
+                this.variables[this.prevSymbol.value]=this.scanExpression();
             }
             
             if (this.symbol.symbolCode !== SymbolsCodes.bracketopen && 
@@ -138,11 +145,15 @@ export class SyntaxAnalyzer {
                     break;
                 case SymbolsCodes.slash:
                     multiplier = new Division(operationSymbol, multiplier, secondTerm);
-                    break;                    
+                    break;            
+                            
             }
         }
         return multiplier;
     }
+
+
+    scanVariables
 
     /**
      *  Разбор "множителя"
@@ -169,6 +180,20 @@ export class SyntaxAnalyzer {
                 this.nextSym();
                 return this.scanMultiplier(minus,negative);
                 }   
+            case SymbolsCodes.identifier: {
+                this.nextSym();
+                let operationSymbol=this.symbol;
+                let variable= this.prevSymbol;
+                if ((operationSymbol=== null || operationSymbol.symbolCode!==SymbolsCodes.equality)&&this.variables[variable.value]===undefined){
+                    throw "value of variable is not stated"
+                }
+               
+                if (operationSymbol.symbolCode===SymbolsCodes.equality){
+                    this.nextSym();
+                    this.variables[variable.value]=this.scanExpression(); 
+                }   
+                return this.variables[variable.value];
+            }
         }     
         
         let integerConstant: SymbolBase | null = this.symbol;
