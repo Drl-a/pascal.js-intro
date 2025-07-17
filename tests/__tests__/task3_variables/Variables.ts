@@ -23,6 +23,6 @@ test('result = -4', () => {
   expect(pjs.engine.results[4]).toBe(-4);
 });
 
-test('result = -4', () => {
-  expect(pjs.engine.results[4]).toBe(-4);
+test('result = 6', () => {
+  expect(pjs.engine.results[5]).toBe(6);
 });

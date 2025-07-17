@@ -59,10 +59,14 @@ export class Engine {
                 result = leftOperand.value - rightOperand.value;
             }
             return new NumberVariable(result as number);
-        } else if (expression instanceof Equality && (expression.left instanceof Variable || expression.left instanceof Equality)) {   
-            let rightOperand = this.evaluateSimpleExpression(expression.right);
-            this.variables[expression.left.symbol.value]= rightOperand.value;
-            return new NumberVariable(this.variables[expression.left.symbol.value]);
+        } else if (expression instanceof Equality){
+            if (expression.left instanceof Variable || expression.left instanceof Equality) {   
+                let rightOperand = this.evaluateSimpleExpression(expression.right);
+                this.variables[expression.left.symbol.value]= rightOperand.value;
+                return new NumberVariable(this.variables[expression.left.symbol.value]);
+            } else {
+                throw 'unacceptable expression'
+            }
         } else {
             return this.evaluateTerm(expression);
         }
@@ -95,7 +99,9 @@ export class Engine {
         } else if (expression instanceof Variable){
             if (expression.symbol.value in this.variables) {
                 return new NumberVariable (this.variables[expression.symbol.value]);   
-            } 
+            } else {
+                throw 'value of variable is not stated'
+            }
         } else if (expression instanceof MinusOperation) {
             if (expression.minusvalue instanceof NumberConstant) {
                 return new NumberVariable (-expression.minusvalue.symbol.value);

@@ -127,13 +127,8 @@ export class SyntaxAnalyzer {
 
             operationSymbol = this.symbol;
             if (this.symbol.symbolCode=== SymbolsCodes.integerConst && (this.prevSymbol===null || this.prevSymbol.symbolCode!== SymbolsCodes.bracketclose)){
-                    throw "Operation symbol expected but int found"
+                throw "Operation symbol expected but int found"
             }
-            /** 
-            if (this.symbol.symbolCode === SymbolsCodes.equality && this.prevSymbol.symbolCode===SymbolsCodes.identifier){
-                this.variables[this.prevSymbol.value]=this.scanExpression();
-            }
-            */
             if (this.symbol.symbolCode !== SymbolsCodes.bracketopen && 
                 this.symbol.symbolCode!==SymbolsCodes.integerConst) {               
                 this.nextSym();                          
