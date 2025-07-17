@@ -1,10 +1,12 @@
 import { Addition } from '../SyntaxAnalyzer/Tree/Addition';
 import { Multiplication } from '../SyntaxAnalyzer/Tree/Multiplication';
 import { Subtraction } from '../SyntaxAnalyzer/Tree/Subtraction';
+import { Equality } from '/home/drl/Desktop/TraliVali/Proverka_G/pascal.js-intro/src/SyntaxAnalyzer/Tree/Equality';
 import { MinusOperation } from '../SyntaxAnalyzer/Tree/MinusOperation';
 import { Division } from '../SyntaxAnalyzer/Tree/Division';
 import { NumberConstant } from '../SyntaxAnalyzer/Tree/NumberConstant';
 import { NumberVariable } from './Variables/NumberVariable';
+import { Variable } from 'src/SyntaxAnalyzer/Tree/Variable';
 import { TreeNodeBase } from '../SyntaxAnalyzer/Tree/TreeNodeBase';
 import { BinaryOperation } from 'src/SyntaxAnalyzer/Tree/BinaryOperation';
 
@@ -13,6 +15,7 @@ export class Engine {
      * Результаты вычислений (изначально - один для каждой строки)
      */
     results: number[];
+    variables={};
 
     /**
      * Деревья, которые получает на вход движок,
@@ -24,6 +27,7 @@ export class Engine {
     constructor(trees: TreeNodeBase[]) {
         this.trees = trees;
         this.results = [];
+        this.variables;
     }
 
     run() {
@@ -54,10 +58,11 @@ export class Engine {
             } else if (expression instanceof Subtraction) {
                 result = leftOperand.value - rightOperand.value;
             }
-
             return new NumberVariable(result as number);
-
-        
+        } else if (expression instanceof Equality && expression.left instanceof Variable) {   
+            let rightOperand = this.evaluateSimpleExpression(expression.right);
+            this.variables[expression.left.symbol.value]= rightOperand.value;
+            return new NumberVariable(this.variables[expression.left.symbol.value]);
         } else {
             return this.evaluateTerm(expression);
         }
@@ -87,6 +92,12 @@ export class Engine {
     evaluateMultiplier(expression: TreeNodeBase) {
         if (expression instanceof NumberConstant) {
             return new NumberVariable(expression.symbol.value);
+        } else if (expression instanceof Variable){
+            if (expression.symbol.value in this.variables) {
+                return new NumberVariable (this.variables[expression.symbol.value]);   
+            } else {
+                return expression.symbol;
+            }
         } else if (expression instanceof MinusOperation) {
             if (expression.minusvalue instanceof NumberConstant) {
                 return new NumberVariable (-expression.minusvalue.symbol.value);
@@ -94,11 +105,11 @@ export class Engine {
                 let result= this.evaluateSimpleExpression(expression.minusvalue)
                 return new NumberVariable(-result.value);
             }
-        } else if (expression instanceof Addition || expression instanceof Subtraction){
+        } else if (expression instanceof Addition || expression instanceof Subtraction || expression instanceof Equality){
             return this.evaluateSimpleExpression(expression);
         } else if (expression instanceof Multiplication || expression instanceof Division){
             return this.evaluateTerm(expression);   
-        }else{         
+        } else {     
             throw 'Number Constant expected.';
         }
     }

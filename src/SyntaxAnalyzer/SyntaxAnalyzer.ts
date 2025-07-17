@@ -2,6 +2,7 @@ import { Multiplication } from './Tree/Multiplication';
 import { Division } from './Tree/Division';
 import { Addition } from './Tree/Addition';
 import { Subtraction } from './Tree/Subtraction';
+import { Equality } from './Tree/Equality';
 import { MinusOperation } from './Tree/MinusOperation';
 import { NumberConstant } from './Tree/NumberConstant';
 import { SymbolsCodes } from '../LexicalAnalyzer/SymbolsCodes';
@@ -9,6 +10,8 @@ import { LexicalAnalyzer } from '../LexicalAnalyzer/LexicalAnalyzer';
 import { TreeNodeBase } from './Tree/TreeNodeBase';
 import { SymbolBase } from '../LexicalAnalyzer/Symbols/SymbolBase';
 import { BinaryOperation } from './Tree/BinaryOperation';
+import { NumberVariable } from 'src/Semantics/Variables/NumberVariable';
+import { Variable } from './Tree/Variable';
 
 /**
  * Синтаксический анализатор - отвечает за построение синтаксического дерева
@@ -18,7 +21,7 @@ export class SyntaxAnalyzer {
     lexicalAnalyzer: LexicalAnalyzer;
     symbol: SymbolBase | null;
     prevSymbol: SymbolBase | null;
-    variables={};
+    
 
     /**
      * Деревья, которые будут построены (например, для каждой строки исходного кода)
@@ -30,7 +33,6 @@ export class SyntaxAnalyzer {
         this.symbol = null;
         this.trees = [];
         this.prevSymbol= null;
-        this.variables;
     }
 
     /**
@@ -39,7 +41,7 @@ export class SyntaxAnalyzer {
      */
 
     nextSym(): void {
-        this.prevSymbol=this.symbol
+        this.prevSymbol=this.symbol;
         this.symbol = this.lexicalAnalyzer.nextSym();
     }
 
@@ -81,7 +83,8 @@ export class SyntaxAnalyzer {
 
         while (this.symbol !== null && (
             this.symbol.symbolCode === SymbolsCodes.plus ||
-            this.symbol.symbolCode === SymbolsCodes.minus
+            this.symbol.symbolCode === SymbolsCodes.minus||
+            this.symbol.symbolCode === SymbolsCodes.equality
         )) {
 
             operationSymbol = this.symbol;
@@ -96,6 +99,8 @@ export class SyntaxAnalyzer {
                 case SymbolsCodes.minus:
                     term = new Subtraction(operationSymbol, term, secondTerm);
                     break;
+                case SymbolsCodes.equality:
+                    term = new Equality(operationSymbol, term, secondTerm);
             }
         }
 
@@ -117,19 +122,18 @@ export class SyntaxAnalyzer {
             this.symbol.symbolCode === SymbolsCodes.star ||
             this.symbol.symbolCode === SymbolsCodes.slash ||
             this.symbol.symbolCode === SymbolsCodes.bracketopen||
-            this.symbol.symbolCode === SymbolsCodes.integerConst ||
-            this.symbol.symbolCode === SymbolsCodes.equality 
+            this.symbol.symbolCode === SymbolsCodes.integerConst
         )) {
 
             operationSymbol = this.symbol;
             if (this.symbol.symbolCode=== SymbolsCodes.integerConst && (this.prevSymbol===null || this.prevSymbol.symbolCode!== SymbolsCodes.bracketclose)){
                     throw "Operation symbol expected but int found"
             }
-
+            /** 
             if (this.symbol.symbolCode === SymbolsCodes.equality && this.prevSymbol.symbolCode===SymbolsCodes.identifier){
                 this.variables[this.prevSymbol.value]=this.scanExpression();
             }
-            
+            */
             if (this.symbol.symbolCode !== SymbolsCodes.bracketopen && 
                 this.symbol.symbolCode!==SymbolsCodes.integerConst) {               
                 this.nextSym();                          
@@ -151,9 +155,6 @@ export class SyntaxAnalyzer {
         }
         return multiplier;
     }
-
-
-    scanVariables
 
     /**
      *  Разбор "множителя"
@@ -181,9 +182,17 @@ export class SyntaxAnalyzer {
                 return this.scanMultiplier(minus,negative);
                 }   
             case SymbolsCodes.identifier: {
+                /**
                 this.nextSym();
                 let operationSymbol=this.symbol;
                 let variable= this.prevSymbol;
+                if (operationSymbol !== null && operationSymbol.symbolCode===SymbolsCodes.equality) {
+                    return new Variable (this.symbol);
+                } else {
+                    return new NumberVariable(this.symbol.value);
+                }
+                */
+                /**
                 if ((operationSymbol=== null || operationSymbol.symbolCode!==SymbolsCodes.equality)&&this.variables[variable.value]===undefined){
                     throw "value of variable is not stated"
                 }
@@ -193,6 +202,9 @@ export class SyntaxAnalyzer {
                     this.variables[variable.value]=this.scanExpression(); 
                 }   
                 return this.variables[variable.value];
+                */
+                this.nextSym();
+                return new Variable(this.prevSymbol);
             }
         }     
         
