@@ -182,27 +182,6 @@ export class SyntaxAnalyzer {
                 return this.scanMultiplier(minus,negative);
                 }   
             case SymbolsCodes.identifier: {
-                /**
-                this.nextSym();
-                let operationSymbol=this.symbol;
-                let variable= this.prevSymbol;
-                if (operationSymbol !== null && operationSymbol.symbolCode===SymbolsCodes.equality) {
-                    return new Variable (this.symbol);
-                } else {
-                    return new NumberVariable(this.symbol.value);
-                }
-                */
-                /**
-                if ((operationSymbol=== null || operationSymbol.symbolCode!==SymbolsCodes.equality)&&this.variables[variable.value]===undefined){
-                    throw "value of variable is not stated"
-                }
-               
-                if (operationSymbol.symbolCode===SymbolsCodes.equality){
-                    this.nextSym();
-                    this.variables[variable.value]=this.scanExpression(); 
-                }   
-                return this.variables[variable.value];
-                */
                 this.nextSym();
                 return new Variable(this.prevSymbol);
             }
