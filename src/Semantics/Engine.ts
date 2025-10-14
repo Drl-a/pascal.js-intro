@@ -1,7 +1,7 @@
 import { Addition } from '../SyntaxAnalyzer/Tree/Addition';
 import { Multiplication } from '../SyntaxAnalyzer/Tree/Multiplication';
 import { Subtraction } from '../SyntaxAnalyzer/Tree/Subtraction';
-import { Equality } from '/home/drl/Desktop/TraliVali/Proverka_G/pascal.js-intro/src/SyntaxAnalyzer/Tree/Equality';
+import { Assignment } from '/home/drl/Desktop/TraliVali/Proverka_G/pascal.js-intro/src/SyntaxAnalyzer/Tree/Assignment';
 import { MinusOperation } from '../SyntaxAnalyzer/Tree/MinusOperation';
 import { Division } from '../SyntaxAnalyzer/Tree/Division';
 import { NumberConstant } from '../SyntaxAnalyzer/Tree/NumberConstant';
@@ -51,7 +51,7 @@ export class Engine {
 
             let leftOperand = this.evaluateSimpleExpression(expression.left);
             let rightOperand = this.evaluateSimpleExpression(expression.right);
-
+           
             let result: number | null = null;
             if (expression instanceof Addition) {
                 result = leftOperand.value + rightOperand.value;
@@ -59,33 +59,62 @@ export class Engine {
                 result = leftOperand.value - rightOperand.value;
             }
             return new NumberVariable(result as number);
-        } else if (expression instanceof Equality){
-            if (expression.left instanceof Variable || expression.left instanceof Equality) {   
-                let rightOperand = this.evaluateSimpleExpression(expression.right);
-                this.variables[expression.left.symbol.value]= rightOperand.value;
-                return new NumberVariable(this.variables[expression.left.symbol.value]);
+        } else if (expression instanceof Assignment){
+            let rightOperand = this.evaluateSimpleExpression(expression.right);
+            this.variables[expression.left.symbol.value]=rightOperand.value;
+            return new NumberVariable (this.variables[expression.left.symbol.value]);
+            /**
+            let rightOperand;
+            if (expression.right instanceof Variable) {
+                rightOperand = this.variables[expression.right.symbol.value];
             } else {
-                throw 'unacceptable expression'
+                rightOperand = this.evaluateSimpleExpression(expression.right)
             }
+            let leftoperand=this.evaluateSimpleExpression(expression.left)
+            rightOperand = this.evaluateSimpleExpression(expression.right);
+            if (expression.left instanceof Variable){
+                this.variables[expression.left.symbol.value]= rightOperand.value
+            } else {
+                leftoperand=this.evaluateSimpleExpression(expression.left)
+            }
+                return new NumberVariable(this.variables[expression.left.symbol.value]);
+            /**  if (expression.left instanceof Variable){
+                this.variables[expression.left.symbol.value] 
+            } else {
+                this.evaluateSimpleExpression(expression.left)
+            }
+            return {this.variables}
+           
+            let leftOperand = this.evaluateSimpleExpression(expression.left);
+            let rightOperand = this.evaluateSimpleExpression(expression.right);
+            
+                    this.variables[leftOperand.value]= rightOperand.value;
+                    return new NumberVariable(this.variables[expression.left.symbol.value]);
+          */      
+            
+            
+                        
         } else {
             return this.evaluateTerm(expression);
         }
     }
 
     evaluateTerm(expression: TreeNodeBase) {
-        if (expression instanceof Multiplication) {
+        if (expression instanceof Multiplication
+            || expression instanceof Division) {
             let leftOperand = this.evaluateTerm(expression.left);
             let rightOperand = this.evaluateTerm(expression.right);
+            
+            if (expression instanceof Multiplication) {
 
-            let result = leftOperand.value * rightOperand.value;
+                let result = leftOperand.value * rightOperand.value;
 
-            return new NumberVariable(result);
-        } else if (expression instanceof Division) {
-            let leftOperand = this.evaluateTerm(expression.left);
-            let rightOperand = this.evaluateTerm(expression.right);
-            let result = leftOperand.value / rightOperand.value;
+                return new NumberVariable(result);
+            } else if (expression instanceof Division) {
 
-            return new NumberVariable(result);
+                let result = leftOperand.value / rightOperand.value;        
+                return new NumberVariable(result);
+            }
         } else {
             return this.evaluateMultiplier(expression);
         }
@@ -99,8 +128,6 @@ export class Engine {
         } else if (expression instanceof Variable){
             if (expression.symbol.value in this.variables) {
                 return new NumberVariable (this.variables[expression.symbol.value]);   
-            } else {
-                throw 'value of variable is not stated'
             }
         } else if (expression instanceof MinusOperation) {
             if (expression.minusvalue instanceof NumberConstant) {
@@ -109,7 +136,7 @@ export class Engine {
                 let result= this.evaluateSimpleExpression(expression.minusvalue)
                 return new NumberVariable(-result.value);
             }
-        } else if (expression instanceof Addition || expression instanceof Subtraction || expression instanceof Equality){
+        } else if (expression instanceof Addition || expression instanceof Subtraction || expression instanceof Assignment){
             return this.evaluateSimpleExpression(expression);
         } else if (expression instanceof Multiplication || expression instanceof Division){
             return this.evaluateTerm(expression);   

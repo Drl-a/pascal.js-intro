@@ -2,7 +2,7 @@ import { Multiplication } from './Tree/Multiplication';
 import { Division } from './Tree/Division';
 import { Addition } from './Tree/Addition';
 import { Subtraction } from './Tree/Subtraction';
-import { Equality } from './Tree/Equality';
+import { Assignment } from './Tree/Assignment';
 import { MinusOperation } from './Tree/MinusOperation';
 import { NumberConstant } from './Tree/NumberConstant';
 import { SymbolsCodes } from '../LexicalAnalyzer/SymbolsCodes';
@@ -86,11 +86,18 @@ export class SyntaxAnalyzer {
             this.symbol.symbolCode === SymbolsCodes.minus||
             this.symbol.symbolCode === SymbolsCodes.equality
         )) {
+            if (this.symbol.symbolCode === SymbolsCodes.equality && this.prevSymbol.symbolCode!==SymbolsCodes.identifier)  {
+                throw 'Unacceptable expression'
+            }  
 
             operationSymbol = this.symbol;
             this.nextSym();
-
-            let secondTerm: TreeNodeBase = this.scanTerm();
+            let secondTerm: TreeNodeBase;
+            if (operationSymbol.symbolCode === SymbolsCodes.equality){
+                secondTerm= this.scanExpression();
+            } else {
+                secondTerm = this.scanTerm(); 
+            }
 
             switch (operationSymbol.symbolCode) {
                 case SymbolsCodes.plus:
@@ -100,10 +107,10 @@ export class SyntaxAnalyzer {
                     term = new Subtraction(operationSymbol, term, secondTerm);
                     break;
                 case SymbolsCodes.equality:
-                    term = new Equality(operationSymbol, term, secondTerm);
+                    term = new Assignment(operationSymbol, term, secondTerm);    
+                    break;       
             }
         }
-
         return term;
     }
 
