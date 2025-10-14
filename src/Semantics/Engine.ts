@@ -59,40 +59,11 @@ export class Engine {
                 result = leftOperand.value - rightOperand.value;
             }
             return new NumberVariable(result as number);
+            
         } else if (expression instanceof Assignment){
             let rightOperand = this.evaluateSimpleExpression(expression.right);
             this.variables[expression.left.symbol.value]=rightOperand.value;
             return new NumberVariable (this.variables[expression.left.symbol.value]);
-            /**
-            let rightOperand;
-            if (expression.right instanceof Variable) {
-                rightOperand = this.variables[expression.right.symbol.value];
-            } else {
-                rightOperand = this.evaluateSimpleExpression(expression.right)
-            }
-            let leftoperand=this.evaluateSimpleExpression(expression.left)
-            rightOperand = this.evaluateSimpleExpression(expression.right);
-            if (expression.left instanceof Variable){
-                this.variables[expression.left.symbol.value]= rightOperand.value
-            } else {
-                leftoperand=this.evaluateSimpleExpression(expression.left)
-            }
-                return new NumberVariable(this.variables[expression.left.symbol.value]);
-            /**  if (expression.left instanceof Variable){
-                this.variables[expression.left.symbol.value] 
-            } else {
-                this.evaluateSimpleExpression(expression.left)
-            }
-            return {this.variables}
-           
-            let leftOperand = this.evaluateSimpleExpression(expression.left);
-            let rightOperand = this.evaluateSimpleExpression(expression.right);
-            
-                    this.variables[leftOperand.value]= rightOperand.value;
-                    return new NumberVariable(this.variables[expression.left.symbol.value]);
-          */      
-            
-            
                         
         } else {
             return this.evaluateTerm(expression);
