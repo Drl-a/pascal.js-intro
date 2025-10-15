@@ -21,7 +21,7 @@ export class SyntaxAnalyzer {
     lexicalAnalyzer: LexicalAnalyzer;
     symbol: SymbolBase | null;
     prevSymbol: SymbolBase | null;
-    
+    grandPrevsymbol: SymbolBase | null;
 
     /**
      * Деревья, которые будут построены (например, для каждой строки исходного кода)
@@ -33,6 +33,7 @@ export class SyntaxAnalyzer {
         this.symbol = null;
         this.trees = [];
         this.prevSymbol= null;
+        this.grandPrevsymbol= null;
     }
 
     /**
@@ -41,6 +42,7 @@ export class SyntaxAnalyzer {
      */
 
     nextSym(): void {
+        this.grandPrevsymbol=this.prevSymbol;
         this.prevSymbol=this.symbol;
         this.symbol = this.lexicalAnalyzer.nextSym();
     }
@@ -86,8 +88,8 @@ export class SyntaxAnalyzer {
             this.symbol.symbolCode === SymbolsCodes.minus||
             this.symbol.symbolCode === SymbolsCodes.equality
         )) {
-            if (this.symbol.symbolCode === SymbolsCodes.equality && this.prevSymbol.symbolCode!==SymbolsCodes.identifier)  {
-                throw 'Unacceptable expression'
+            if (this.symbol.symbolCode === SymbolsCodes.equality && this.prevSymbol.symbolCode!==SymbolsCodes.identifier || this.grandPrevsymbol !==null && this.grandPrevsymbol.symbolCode !==SymbolsCodes.equality)  {
+                throw 'Unacceptable expression';
             }  
 
             operationSymbol = this.symbol;

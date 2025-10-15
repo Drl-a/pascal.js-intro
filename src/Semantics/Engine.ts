@@ -1,7 +1,7 @@
 import { Addition } from '../SyntaxAnalyzer/Tree/Addition';
 import { Multiplication } from '../SyntaxAnalyzer/Tree/Multiplication';
 import { Subtraction } from '../SyntaxAnalyzer/Tree/Subtraction';
-import { Assignment } from '/home/drl/Desktop/TraliVali/Proverka_G/pascal.js-intro/src/SyntaxAnalyzer/Tree/Assignment';
+import { Assignment } from '../SyntaxAnalyzer/Tree/Assignment';
 import { MinusOperation } from '../SyntaxAnalyzer/Tree/MinusOperation';
 import { Division } from '../SyntaxAnalyzer/Tree/Division';
 import { NumberConstant } from '../SyntaxAnalyzer/Tree/NumberConstant';
@@ -63,8 +63,8 @@ export class Engine {
         } else if (expression instanceof Assignment){
             let rightOperand = this.evaluateSimpleExpression(expression.right);
             this.variables[expression.left.symbol.value]=rightOperand.value;
-            return new NumberVariable (this.variables[expression.left.symbol.value]);
-                        
+            return new NumberVariable (this.variables[expression.left.symbol.value]);     
+            
         } else {
             return this.evaluateTerm(expression);
         }
