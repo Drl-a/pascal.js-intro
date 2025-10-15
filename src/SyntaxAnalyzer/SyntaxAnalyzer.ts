@@ -88,7 +88,12 @@ export class SyntaxAnalyzer {
             this.symbol.symbolCode === SymbolsCodes.minus||
             this.symbol.symbolCode === SymbolsCodes.equality
         )) {
-            if (this.symbol.symbolCode === SymbolsCodes.equality && this.prevSymbol.symbolCode!==SymbolsCodes.identifier || this.grandPrevsymbol !==null && this.grandPrevsymbol.symbolCode !==SymbolsCodes.equality)  {
+            if (this.symbol.symbolCode === SymbolsCodes.equality && 
+                this.prevSymbol.symbolCode!==SymbolsCodes.identifier || 
+                this.grandPrevsymbol !==null && 
+                this.grandPrevsymbol.symbolCode !==SymbolsCodes.equality && 
+                this.grandPrevsymbol.symbolCode !==SymbolsCodes.endOfLine && 
+                this.grandPrevsymbol.symbolCode !==SymbolsCodes.bracketopen)  {
                 throw 'Unacceptable expression';
             }  
 
